@@ -4,11 +4,6 @@
 ##       ENVIRONMENTAL CONFIG          ##
 #########################################
 
-# Configure user permissions
-addgroup --gid 1000 tgroup
-adduser --home /config --uid 1000 --ingroup tgroup  --disabled-password --gecos "" tuser
-chown -R tuser:tgroup /config
-
 
 # Disable SSH
 rm -rf /etc/service/sshd /etc/my_init.d/00_regen_ssh_host_keys.sh
@@ -24,76 +19,78 @@ echo 'deb http://archive.ubuntu.com/ubuntu trusty-updates main universe restrict
 
 
 # Install Dependencies
+add-apt-repository ppa:qbittorrent-team/qbittorrent-stable -y
 apt-get update -qq
-apt-get install -qy wget sendmail libio-socket-inet6-perl libio-socket-ssl-perl libnet-libidn-perl libnet-ssleay-perl libsocket6-perl ssl-cert libio-socket-ip-perl libjson-any-perl
+apt-get install -qy wget
 
 #########################################
 ## FILES, SERVICES AND CONFIGURATION   ##
 #########################################
 
 # Initiate config directory
-mkdir -p /config
-mkdir -p /ddclient
+mkdir -p /default /config /downloads /watched
 
 
-# Config
-cat <<'EOT' > /etc/my_init.d/00_config.sh
-#!/bin/bash
-
-# Set cache directory
-
-mkdir -p /config/cache
-
-# Checking if sample configuration exists
-
-if [ -f "/config/sample-etc_ddclient.conf" ]; then
-  echo "Sample config exists, nothing to do!"
-else
-  echo "Sample config dosent exist, creating a new one."
-  cp /ddclient/sample-etc_ddclient.conf /config/sample-etc_ddclient.conf
-fi
-EOT
-
-# Config
+# Config user permissions
 cat <<'EOT' > /etc/my_init.d/05_user.sh
 #!/bin/bash
+AUSER=${AUSER:-65534}
+AGROUP=${AGROUP:-100}
+echo "Setting user permissions to match host"
+if [ ! "$(id -u nobody)" -eq "$AUSER" ]; then
+  usermod -o -u "$AUSER" nobody
+fi
+if [ ! "$(getent group users | cut -d: -f3)" -eq "$AGROUP" ]; then
+  groupmod -g "$AGROUP" users && usermod -g "$AGROUP" nobody
+else
+  usermod -g 100 nobody
+fi
+usermod -d /config nobody
+EOT
 
-# Set user permissions to match host
-if [ -v "TGID" ]; then
-  echo "Setting user permissions to match host (UID / GID)..."
-  groupmod -g $TGID tgroup
-  usermod -u $TUID tuser
-  usermod -g $TGID tuser
-  usermod -d /config tuser
-  chown -R tuser:tgroup /config
+
+# Generate ssl cert to be used with webui
+cat <<'EOT' > /etc/my_init.d/06_config.sh
+#!/bin/bash
+echo "Generating ssl certs for webui"
+if [ ! -f /config/https_cert.txt ]; then
+  openssl req -nodes -new -x509 -keyout /default/server.key -out /default/server.cert -subj "/C=GB/ST=London/L=London/O=Global Security/OU=IT Department/CN=example.com"
+  cat /default/server.key > /config/https_cert.txt && cat /default/server.cert >> /config/https_cert.txt
 fi
 EOT
 
 
 
-# QbitTorrent Service
-mkdir -p /etc/service/ddclient
 
-cat <<'EOT' > /etc/service/ddclient/run
+
+cat <<'EOT' > /etc/my_init.d/10_config.sh
 #!/bin/bash
-# ddclient startup service
+echo "Checking if updates are avaible this might take awhile!"
+apt-get update -qq && apt-get --only-upgrade install -yqq
+echo "Checking if Torrent config exist, if not creating it"
 
-if [ -f "/ddclient/pid/ddclient.pid" ]; then
-  rm /ddclient/pid/ddclient.pid
+if [ ! -d /config/.config/qBittorrent ]; then
+  mkdir -p /config/.config/qBittorrent
 fi
 
-if [ -v "PIPEWORK" ]; then
+if [ ! -f /config/.config/qBittorrent/qBittorrent.conf ]; then
+  cp /default/qBittorrent.conf /config/.config/qBittorrent/qBittorrent.conf
+fi
+
+chown -R nobody:users /config /downloads /watched /default
+EOT
+
+# QbitTorrent Service
+mkdir -p /etc/service/qbittorrent
+
+cat <<'EOT' > /etc/service/qbittorrent/run
+#!/bin/bash
+# qbittorrent startup service
+if [ -v PIPEWORK ]; then
   echo "Pipework is enabled waiting for network to come up..."
   pipework --wait
 fi
-
-if [ ! -f "/config/ddclient.conf" ]; then
-  echo "ddclient.conf does not exist in host directory!!!"
-  echo "Rename sample-etc_ddclient.conf to ddclient.conf and configure it or create a new file..."
-else
-  echo "Configuration exists starting ddclient"
-  su nobody -s /bin/bash -c "ddclient -foreground -syslog -pid /ddclient/pid/ddclient.pid -file /config/ddclient.conf -cache /config/cache/ddclient.cache"
-fi
+  start-stop-daemon -c nobody -g users -b --start --quiet --exec /usr/bin/qbittorrent-nox
 EOT
 
 
@@ -106,17 +103,26 @@ EOT
 wget -O /usr/local/bin/pipework https://raw.githubusercontent.com/jpetazzo/pipework/master/pipework
 chmod +x /usr/local/bin/pipework
 
-# Install ddclient
-cd /tmp/
-wget "http://sourceforge.net/projects/ddclient/files/ddclient/ddclient-3.8.3/ddclient-3.8.3.tar.bz2"
-tar -xvf ddclient-3.8.3.tar.bz2
-mv ddclient-3.8.3/* /ddclient/
-chown -R nobody:users /ddclient
-cp /ddclient/ddclient /usr/sbin/
+# Install Qbittorrent
+apt-get install -qy qbittorrent-nox
+
+# Qbittorrent default config
+cat <<'EOT' > /default/qBittorrent.conf
+[Preferences]
+General\Locale=en_US
+WebUI\Port=8082
+Downloads\SavePath=/downloads
+Connection\PortRangeMin=6881
+
+[LegalNotice]
+Accepted=true
+
+[General]
+ported_to_new_savepath_system=true
+EOT
 
 # Make start scripts executable
 chmod -R +x /etc/my_init.d/ /etc/service/
-
 
 
 #########################################

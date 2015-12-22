@@ -24,4 +24,9 @@ RUN chmod +x /tmp/install.sh && sleep 1 && /tmp/install.sh && rm /tmp/install.sh
 ##           PORTS AND VOLUMES               ##
 ###############################################
 
+EXPOSE 8082
+EXPOSE 6881
+
 VOLUME /config
+VOLUME /downloads
+VOLUME /watched

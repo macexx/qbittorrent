@@ -1,49 +1,43 @@
-DDclient
+qBittorrent
 ==========================
 
 
-DDclient - http://sourceforge.net/p/ddclient/wiki/Home/ 
+DDclient - http://www.qbittorrent.org/
 
 
 
-Running on the latest Phusion release (ubuntu 14.04), with ddclient 3.8.3
+Running on the latest Phusion release (ubuntu 14.04), with qBittorrent 3.3.1
 
 **Pull image**
 
 ```
-docker pull mace/ddclient
+docker pull mace/qbittorrent
 ```
-**Container config**
-
-*Rename the sample config to ddclient.conf in the host directory
-*The sample config will be avaible afer the first run
 
 
 **Run container**
 
 ```
-docker run -d --net="bridge" --name=<container name> -v <path for ddclient config files>:/config -v /etc/localtime:/etc/localtime:ro mace/ddclient
+docker run -d --net="bridge" -p 8080:8080 -p 6881:6881 --name=<container name> -v <path for qbit config files>:/config -v /etc/localtime:/etc/localtime:ro -v <path for download files>:/downloads -v <path for torrent watched files>:/downloads -e AUSER=<host user UID> -e AGROUP=<host user GID> mace/qbittorrent
 ```
 Please replace all user variables in the above command defined by <> with the correct values.
 ```
--e PIPEWORK=<yes>
+-e AUSER=<host user UID> (match with the host users UID)
+-e AGROUP=<host user GID> (match with the host users GID)
+-e PIPEWORK=<yes> can be added to wait for network connection
 ```
 
 **Example**
 
 ```
-docker run -d --net="bridge" --name=ddclient -v /mylocal/directory/fordata:/config -v /etc/localtime:/etc/localtime:ro mace/ddclient
+docker run -d --net="bridge" -p 8080:8080 -p 6881:6881 --name=qbittorrent -v /local_directory/downloads:/downloads -v /local_directory/config:/config -v /local_directory/watched:/watched -v /etc/localtime:/etc/localtime:ro -e AUSER=1000 -e AGROUP=1000 mace/ddclient
 ```
 
-For use with "pipework" --  https://hub.docker.com/r/dreamcat4/pipework/
-
-```
-docker run -d --net=none --name=ddclient -v /mylocal/directory/fordata:/config -v /etc/localtime:/etc/localtime:ro -e  PIPEWORK=yes -e 'pipework_cmd=br1 @ddclient@ 192.168.1.10/24@192.168.1.1' mace/ddclient
-```
 
 
 **Additional notes**
 
-
-* The owner of the config directory needs sufficent permissions (UUID 99 / GID 100).
-* Check the manual from the link on the top for how to setup your ddclient config.
+* WebUI http://localhost:8082 (admin / adminadmin)
+* SSL certs are generated and can be found in /config/https_certs.txt (copy paste them in webgui if you want "https")
+* The owner of the config directory needs sufficent permissions.
+* If AUSER / AGROUP is not selected UID and GID will default to ("65534"/"100" Ubuntu defaults for user "nobody" and group "users")
