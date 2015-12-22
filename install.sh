@@ -19,9 +19,8 @@ echo 'deb http://archive.ubuntu.com/ubuntu trusty-updates main universe restrict
 
 
 # Install Dependencies
-add-apt-repository ppa:qbittorrent-team/qbittorrent-stable -y
 apt-get update -qq
-apt-get install -qy wget
+apt-get install -qy wget libboost-system1.54.0 libqt5network5 libgeoip1
 
 #########################################
 ## FILES, SERVICES AND CONFIGURATION   ##
@@ -60,13 +59,8 @@ fi
 EOT
 
 
-
-
-
 cat <<'EOT' > /etc/my_init.d/10_config.sh
 #!/bin/bash
-echo "Checking if updates are avaible this might take awhile!"
-apt-get update -qq && apt-get --only-upgrade install -yqq
 echo "Checking if Torrent config exist, if not creating it"
 
 if [ ! -d /config/.config/qBittorrent ]; then
@@ -104,7 +98,11 @@ wget -O /usr/local/bin/pipework https://raw.githubusercontent.com/jpetazzo/pipew
 chmod +x /usr/local/bin/pipework
 
 # Install Qbittorrent
-apt-get install -qy qbittorrent-nox
+cd /tmp
+wget https://raw.githubusercontent.com/macexx/ubuntu-builds/master/qbittorrent/libtorrent-rasterbar_1.0.7-1_amd64.deb
+wget https://raw.githubusercontent.com/macexx/ubuntu-builds/master/qbittorrent/qbittorrent_3.3.1-1_amd64.deb
+dpkg -i libtorrent-rasterbar_1.0.7-1_amd64.deb
+dpkg -i qbittorrent_3.3.1-1_amd64.deb
 
 # Qbittorrent default config
 cat <<'EOT' > /default/qBittorrent.conf

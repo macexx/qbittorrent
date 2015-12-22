@@ -2,11 +2,11 @@ qBittorrent
 ==========================
 
 
-DDclient - http://www.qbittorrent.org/
+qBittorrent - http://www.qbittorrent.org/
 
 
 
-Running on the latest Phusion release (ubuntu 14.04), with qBittorrent 3.3.1
+Running on the latest Phusion release (ubuntu 14.04), with qBittorrent 3.3.1 (Built from source)
 
 **Pull image**
 
