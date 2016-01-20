@@ -100,9 +100,9 @@ chmod +x /usr/local/bin/pipework
 # Install Qbittorrent
 cd /tmp
 wget https://raw.githubusercontent.com/macexx/ubuntu-builds/master/qbittorrent/libtorrent-rasterbar_1.0.7-1_amd64.deb
-wget https://raw.githubusercontent.com/macexx/ubuntu-builds/master/qbittorrent/qbittorrent_3.3.1-1_amd64.deb
+wget https://raw.githubusercontent.com/macexx/ubuntu-builds/master/qbittorrent/qbittorrent-nox_3.3.2.deb
 dpkg -i libtorrent-rasterbar_1.0.7-1_amd64.deb
-dpkg -i qbittorrent_3.3.1-1_amd64.deb
+dpkg -i qbittorrent-nox_3.3.2.deb
 
 # Qbittorrent default config
 cat <<'EOT' > /default/qBittorrent.conf
