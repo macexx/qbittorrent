@@ -20,7 +20,7 @@ echo 'deb http://archive.ubuntu.com/ubuntu trusty-updates main universe restrict
 
 # Install Dependencies
 apt-get update -qq
-apt-get install -qy wget libboost-system1.54.0 libqt5network5 libgeoip1
+apt-get install -qy wget libboost-system1.54.0 libqt5network5 libqt5xml5 libgeoip1
 
 #########################################
 ## FILES, SERVICES AND CONFIGURATION   ##
