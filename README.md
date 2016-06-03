@@ -6,7 +6,7 @@ qBittorrent - http://www.qbittorrent.org/
 
 
 
-Running on the latest Phusion release (ubuntu 14.04), with qBittorrent 3.3.3 (Built from source)
+Running on the latest Phusion release (ubuntu 14.04), with qBittorrent 3.3.4 (Built from source) and Libbtorrent 1.1.0(built from source).
 
 **Pull image**
 
