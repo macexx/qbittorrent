@@ -20,7 +20,7 @@ echo 'deb http://archive.ubuntu.com/ubuntu trusty-updates main universe restrict
 
 # Install Dependencies
 apt-get update -qq
-apt-get install -qy wget libboost-system1.54.0 libqt5network5 libqt5xml5 libgeoip1
+apt-get install -qy wget libboost-system1.54.0 libboost-chrono1.54.0 libboost-random1.54.0 libqt5network5 libqt5xml5 libgeoip1
 
 #########################################
 ## FILES, SERVICES AND CONFIGURATION   ##
@@ -99,10 +99,10 @@ chmod +x /usr/local/bin/pipework
 
 # Install Qbittorrent
 cd /tmp
-wget https://raw.githubusercontent.com/macexx/ubuntu-builds/master/qbittorrent/libtorrent-rasterbar_1.1.0-1_amd64.deb
-wget https://raw.githubusercontent.com/macexx/ubuntu-builds/master/qbittorrent/qbittorrent_3.3.4-1_amd64.deb
-dpkg -i libtorrent-rasterbar_1.1.0-1_amd64.deb
-dpkg -i qbittorrent_3.3.4-1_amd64.deb
+wget https://github.com/macexx/ubuntu-builds/blob/master/libtorrent-rasterbar_1.1.0-2_amd64.deb?raw=true -O libtorrent-rasterbar_1.1.0-2_amd64.deb
+wget https://github.com/macexx/ubuntu-builds/blob/master/qbittorrent_3.3.4-2_amd64.deb?raw=true -O qbittorrent_3.3.4-2_amd64.deb
+dpkg -i libtorrent-rasterbar_1.1.0-2_amd64.deb 
+dpkg -i qbittorrent_3.3.4-2_amd64.deb
 
 # Qbittorrent default config
 cat <<'EOT' > /default/qBittorrent.conf

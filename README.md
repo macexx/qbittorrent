@@ -30,7 +30,7 @@ Please replace all user variables in the above command defined by <> with the co
 **Example**
 
 ```
-docker run -d --net="bridge" -p 8080:8080 -p 6881:6881 --name=qbittorrent -v /local_directory/downloads:/downloads -v /local_directory/config:/config -v /local_directory/watched:/watched -v /etc/localtime:/etc/localtime:ro -e AUSER=1000 -e AGROUP=1000 mace/ddclient
+docker run -d --net="bridge" -p 8080:8080 -p 6881:6881 --name=qbittorrent -v /local_directory/downloads:/downloads -v /local_directory/config:/config -v /local_directory/watched:/watched -v /etc/localtime:/etc/localtime:ro -e AUSER=1000 -e AGROUP=1000 mace/qbittorrent
 ```
 
 
