@@ -20,7 +20,7 @@ echo 'deb http://archive.ubuntu.com/ubuntu trusty-updates main universe restrict
 
 # Install Dependencies
 apt-get update -qq
-apt-get install software-properties-common
+apt-get install -qy software-properties-common
 
 #########################################
 ## FILES, SERVICES AND CONFIGURATION   ##
@@ -108,7 +108,7 @@ chmod +x /usr/local/bin/pipework
 # Install Qbittorrent
 add-apt-repository ppa:qbittorrent-team/qbittorrent-stable -y
 apt-get update
-apt-get install qbittorrent-nox
+apt-get install -qy qbittorrent-nox
 # Qbittorrent default config
 cat <<'EOT' > /default/qBittorrent.conf
 [Preferences]
