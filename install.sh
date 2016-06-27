@@ -20,7 +20,7 @@ echo 'deb http://archive.ubuntu.com/ubuntu trusty-updates main universe restrict
 
 # Install Dependencies
 apt-get update -qq
-apt-get install -qy wget libboost-system1.54.0 libboost-chrono1.54.0 libboost-random1.54.0 libqt5network5 libqt5xml5 libgeoip1
+apt-get install software-properties-common
 
 #########################################
 ## FILES, SERVICES AND CONFIGURATION   ##
@@ -28,6 +28,14 @@ apt-get install -qy wget libboost-system1.54.0 libboost-chrono1.54.0 libboost-ra
 
 # Initiate config directory
 mkdir -p /default /config /downloads /watched
+
+
+# Auto Update
+cat <<'EOT' > /etc/my_init.d/01_update.sh 
+echo "Upgrading local packages(Security) - This might take awhile(first run takes some extra time)"
+apt-get update -qq && apt-get upgrade -yqq
+echo "Upgrade Done...."
+EOT
 
 
 # Config user permissions
@@ -98,12 +106,9 @@ wget -O /usr/local/bin/pipework https://raw.githubusercontent.com/jpetazzo/pipew
 chmod +x /usr/local/bin/pipework
 
 # Install Qbittorrent
-cd /tmp
-wget https://github.com/macexx/ubuntu-builds/blob/master/libtorrent-rasterbar_1.1.0-2_amd64.deb?raw=true -O libtorrent-rasterbar_1.1.0-2_amd64.deb
-wget https://github.com/macexx/ubuntu-builds/blob/master/qbittorrent_3.3.4-2_amd64.deb?raw=true -O qbittorrent_3.3.4-2_amd64.deb
-dpkg -i libtorrent-rasterbar_1.1.0-2_amd64.deb 
-dpkg -i qbittorrent_3.3.4-2_amd64.deb
-
+add-apt-repository ppa:qbittorrent-team/qbittorrent-stable -y
+apt-get update
+apt-get install qbittorrent-nox
 # Qbittorrent default config
 cat <<'EOT' > /default/qBittorrent.conf
 [Preferences]
