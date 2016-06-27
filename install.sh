@@ -32,6 +32,7 @@ mkdir -p /default /config /downloads /watched
 
 # Auto Update
 cat <<'EOT' > /etc/my_init.d/01_update.sh 
+#!/bin/bash
 echo "Upgrading local packages(Security) - This might take awhile(first run takes some extra time)"
 apt-get update -qq && apt-get upgrade -yqq
 echo "Upgrade Done...."
